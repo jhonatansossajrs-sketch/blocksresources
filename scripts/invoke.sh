@@ -1,21 +1,5 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
-
-# ==============================================================================
-# Block's Resources - Environmental Resource Tracking CLI
-# ==============================================================================
-#
-# PREREQUISITES:
-# 1. Soroban CLI must be installed and in your PATH.
-# 2. You must have the secret keys for the addresses below configured
-#    in your Soroban CLI wallet (e.g., using `soroban keys add ...`).
-# 3. A file named `contract_id.txt` must exist in the same directory
-#    and contain the deployed contract ID.
-#
-# ==============================================================================
-
 # Configuración de la red
 NETWORK="testnet"
 SOROBAN_RPC_URL="https://soroban-testnet.stellar.org:443"
@@ -26,23 +10,8 @@ SIGNER1_ADDRESS="GBMY6UIHGFIPM2ZWXBB5U7AJTSASWL7BB4PVYVNAZZQYEUQU3UYJOWYH"
 SIGNER2_ADDRESS="GDIK733AD4V2CDQMMZGXLFGNM7W3234IORXIGVT2BCHSUDAWI42BRD3J"
 RECIPIENT_ADDRESS="GDIK733AD4V2CDQMMZGXLFGNM7W3234IORXIGVT2BCHSUDAWI42BRD3J"
 
-# --- INICIO DE LA CORRECCIÓN ---
-# Verificar si el archivo contract_id.txt existe y no está vacío
-if [ ! -f "contract_id.txt" ]; then
-    echo "Error: El archivo 'contract_id.txt' no fue encontrado."
-    echo "Por favor, crea este archivo en el mismo directorio y añade el ID de tu contrato."
-    exit 1
-fi
-
+# Obtener el ID del contrato
 CONTRACT_ID=$(cat contract_id.txt)
-
-if [ -z "$CONTRACT_ID" ]; then
-    echo "Error: El archivo 'contract_id.txt' está vacío."
-    echo "Por favor, añade el ID de tu contrato al archivo."
-    exit 1
-fi
-# --- FIN DE LA CORRECCIÓN ---
-
 
 # Menú de opciones
 echo "Block's Resources - Environmental Resource Tracking"
@@ -68,10 +37,10 @@ case $OPTION in
     
     echo "Registering resource..."
     soroban contract invoke \
-      --id "$CONTRACT_ID" \
-      --source "$ADMIN_ADDRESS" \
-      --network "$NETWORK" \
-      --rpc-url "$SOROBAN_RPC_URL" \
+      --id $CONTRACT_ID \
+      --source $ADMIN_ADDRESS \
+      --network $NETWORK \
+      --rpc-url $SOROBAN_RPC_URL \
       -- \
       register_resource \
       --name "$NAME" \
@@ -85,7 +54,7 @@ case $OPTION in
     echo "Enter proposer address (1 for $SIGNER1_ADDRESS, 2 for $SIGNER2_ADDRESS):"
     read PROPOSER_CHOICE
     
-    if [ "$PROPOSER_CHOICE" -eq 1 ]; then
+    if [ $PROPOSER_CHOICE -eq 1 ]; then
       PROPOSER=$SIGNER1_ADDRESS
     else
       PROPOSER=$SIGNER2_ADDRESS
@@ -102,15 +71,15 @@ case $OPTION in
     
     echo "Creating transfer proposal..."
     soroban contract invoke \
-      --id "$CONTRACT_ID" \
-      --source "$PROPOSER" \
-      --network "$NETWORK" \
-      --rpc-url "$SOROBAN_RPC_URL" \
+      --id $CONTRACT_ID \
+      --source $PROPOSER \
+      --network $NETWORK \
+      --rpc-url $SOROBAN_RPC_URL \
       -- \
       create_transfer_proposal \
-      --proposer "$PROPOSER" \
-      --resource-id "$RESOURCE_ID" \
-      --new-owner "$RECIPIENT" \
+      --proposer $PROPOSER \
+      --resource-id $RESOURCE_ID \
+      --new-owner $RECIPIENT \
       --description "$DESCRIPTION"
     ;;
     
@@ -120,7 +89,7 @@ case $OPTION in
     echo "Enter signer address (1 for $SIGNER1_ADDRESS, 2 for $SIGNER2_ADDRESS):"
     read SIGNER_CHOICE
     
-    if [ "$SIGNER_CHOICE" -eq 1 ]; then
+    if [ $SIGNER_CHOICE -eq 1 ]; then
       SIGNER=$SIGNER1_ADDRESS
     else
       SIGNER=$SIGNER2_ADDRESS
@@ -128,14 +97,14 @@ case $OPTION in
     
     echo "Signing proposal..."
     soroban contract invoke \
-      --id "$CONTRACT_ID" \
-      --source "$SIGNER" \
-      --network "$NETWORK" \
-      --rpc-url "$SOROBAN_RPC_URL" \
+      --id $CONTRACT_ID \
+      --source $SIGNER \
+      --network $NETWORK \
+      --rpc-url $SOROBAN_RPC_URL \
       -- \
       sign_proposal \
-      --signer "$SIGNER" \
-      --proposal-id "$PROPOSAL_ID"
+      --signer $SIGNER \
+      --proposal-id $PROPOSAL_ID
     ;;
     
   4)
@@ -144,12 +113,12 @@ case $OPTION in
     
     echo "Getting resource information..."
     soroban contract invoke \
-      --id "$CONTRACT_ID" \
-      --network "$NETWORK" \
-      --rpc-url "$SOROBAN_RPC_URL" \
+      --id $CONTRACT_ID \
+      --network $NETWORK \
+      --rpc-url $SOROBAN_RPC_URL \
       -- \
       get_resource \
-      --resource-id "$RESOURCE_ID"
+      --resource-id $RESOURCE_ID
     ;;
     
   5)
@@ -158,20 +127,20 @@ case $OPTION in
     
     echo "Getting proposal information..."
     soroban contract invoke \
-      --id "$CONTRACT_ID" \
-      --network "$NETWORK" \
-      --rpc-url "$SOROBAN_RPC_URL" \
+      --id $CONTRACT_ID \
+      --network $NETWORK \
+      --rpc-url $SOROBAN_RPC_URL \
       -- \
       get_proposal \
-      --proposal-id "$PROPOSAL_ID"
+      --proposal-id $PROPOSAL_ID
     ;;
     
   6)
     echo "Getting list of authorized signers..."
     soroban contract invoke \
-      --id "$CONTRACT_ID" \
-      --network "$NETWORK" \
-      --rpc-url "$SOROBAN_RPC_URL" \
+      --id $CONTRACT_ID \
+      --network $NETWORK \
+      --rpc-url $SOROBAN_RPC_URL \
       -- \
       get_signers
     ;;
@@ -182,14 +151,14 @@ case $OPTION in
     
     echo "Adding new signer..."
     soroban contract invoke \
-      --id "$CONTRACT_ID" \
-      --source "$ADMIN_ADDRESS" \
-      --network "$NETWORK" \
-      --rpc-url "$SOROBAN_RPC_URL" \
+      --id $CONTRACT_ID \
+      --source $ADMIN_ADDRESS \
+      --network $NETWORK \
+      --rpc-url $SOROBAN_RPC_URL \
       -- \
       add_signer \
-      --admin "$ADMIN_ADDRESS" \
-      --new-signer "$NEW_SIGNER"
+      --admin $ADMIN_ADDRESS \
+      --new-signer $NEW_SIGNER
     ;;
     
   *)
