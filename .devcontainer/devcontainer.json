@@ -1,0 +1,15 @@
+{
+  "name": "Block's Resources - Soroban Development",
+  "dockerfile": "Dockerfile",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "ms-vscode.cpptools",
+        "ms-vscode.makefile-tools"
+      ]
+    }
+  },
+  "postCreateCommand": "./scripts/setup.sh",
+  "remoteUser": "vscode"
+}
